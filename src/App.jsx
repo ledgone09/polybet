@@ -215,8 +215,8 @@ function App() {
                   <span className="stat-label">Current Pool</span>
                 </div>
                 <div className="stat-item">
-                  <span className="stat-value">3 Days</span>
-                  <span className="stat-label">Voting Cycle</span>
+                  <span className="stat-value">{formatTime(timeRemaining)}</span>
+                  <span className="stat-label">Time Remaining</span>
                 </div>
                 <div className="stat-item">
                   <span className="stat-value">{voteStats.current.total + voteStats.next.total}</span>
