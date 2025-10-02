@@ -40,7 +40,7 @@ export const getStoredVotes = async () => {
   } catch (error) {
     console.error('Error reading votes from Firebase:', error);
     // Fallback to localStorage
-    const stored = localStorage.getItem('coinvote_votes_backup');
+    const stored = localStorage.getItem('polybet_votes_backup');
     return stored ? JSON.parse(stored) : {
       [CURRENT_QUESTION_ID]: {},
       [NEXT_TOPIC_QUESTION_ID]: {}
@@ -74,7 +74,7 @@ export const storeVote = async (questionId, userWallet, vote, tokenBalance) => {
     
     // Also save to localStorage as backup
     const allVotes = await getStoredVotes();
-    localStorage.setItem('coinvote_votes_backup', JSON.stringify(allVotes));
+    localStorage.setItem('polybet_votes_backup', JSON.stringify(allVotes));
     
     return true;
   } catch (error) {
@@ -82,7 +82,7 @@ export const storeVote = async (questionId, userWallet, vote, tokenBalance) => {
     
     // Fallback to localStorage
     try {
-      const votes = JSON.parse(localStorage.getItem('coinvote_votes_backup') || '{}');
+      const votes = JSON.parse(localStorage.getItem('polybet_votes_backup') || '{}');
       if (!votes[questionId]) {
         votes[questionId] = {};
       }
@@ -91,7 +91,7 @@ export const storeVote = async (questionId, userWallet, vote, tokenBalance) => {
         timestamp: Date.now(),
         tokenBalance
       };
-      localStorage.setItem('coinvote_votes_backup', JSON.stringify(votes));
+      localStorage.setItem('polybet_votes_backup', JSON.stringify(votes));
       return true;
     } catch (localError) {
       console.error('Error with localStorage fallback:', localError);
@@ -153,7 +153,7 @@ export const clearAllVotes = async () => {
       [CURRENT_QUESTION_ID]: {},
       [NEXT_TOPIC_QUESTION_ID]: {}
     });
-    localStorage.removeItem('coinvote_votes_backup');
+    localStorage.removeItem('polybet_votes_backup');
     return true;
   } catch (error) {
     console.error('Error clearing votes:', error);

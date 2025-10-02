@@ -196,11 +196,11 @@ function App() {
           <div className="hero-content">
             <div className="hero-top">
               <h1 className="hero-title">
-                <span className="title-line">Market Intelligence</span>
-                <span className="title-line">Powered by Collective Wisdom</span>
+                <span className="title-line">PolyBet</span>
+                <span className="title-line">Decentralized Prediction Markets</span>
               </h1>
               <p className="hero-description">
-                CoinVote revolutionizes prediction markets with a unique model where creator fees directly fund community rewards. 
+                PolyBet revolutionizes prediction markets with a unique model where creator fees directly fund community rewards. 
                 Participate in high-stakes market and geopolitical predictions with transparent voting every 72 hours.
               </p>
               <div className="how-it-works-brief">
