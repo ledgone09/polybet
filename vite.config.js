@@ -6,24 +6,28 @@ export default defineConfig({
   plugins: [react()],
   define: {
     global: 'globalThis',
+    'process.env': {}
   },
   resolve: {
     alias: {
       buffer: 'buffer',
+      process: 'process/browser',
+      stream: 'stream-browserify',
+      util: 'util'
     },
   },
   optimizeDeps: {
-    include: ['buffer'],
-    exclude: ['@solana/wallet-adapter-phantom']
+    include: ['buffer', 'process'],
+    esbuildOptions: {
+      define: {
+        global: 'globalThis'
+      }
+    }
   },
   build: {
+    target: 'esnext',
     rollupOptions: {
-      external: ['buffer'],
-      output: {
-        globals: {
-          buffer: 'Buffer',
-        }
-      }
+      plugins: []
     }
   }
 })

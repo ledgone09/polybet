@@ -4,9 +4,13 @@ import './index.css'
 import App from './App.jsx'
 import { AppWalletProvider } from './WalletProvider.jsx'
 
-// Add polyfill for Buffer
+// Polyfills for Solana web3.js
 import { Buffer } from 'buffer'
+import process from 'process'
+
 window.Buffer = Buffer
+window.process = process
+window.global = window
 
 createRoot(document.getElementById('root')).render(
   <AppWalletProvider>
