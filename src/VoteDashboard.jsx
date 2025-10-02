@@ -613,17 +613,7 @@ function VoteDashboard({ setShowDashboard }) {
                 className="phantom-connect-btn"
                 disabled={loading}
               >
-                {loading ? (
-                  <>
-                    <span className="loading-spinner">⏳</span>
-                    Connecting...
-                  </>
-                ) : (
-                  <>
-                    <span className="phantom-icon">👻</span>
-                    Connect Phantom Wallet
-                  </>
-                )}
+                {loading ? 'Connecting...' : 'Connect Phantom Wallet'}
               </button>
             )}
             <button 
@@ -631,7 +621,7 @@ function VoteDashboard({ setShowDashboard }) {
               className="refresh-button"
               disabled={loading}
             >
-              {loading ? 'Refreshing...' : '🔄 Refresh Data'}
+              {loading ? 'Refreshing...' : 'Refresh Data'}
             </button>
           </div>
         </div>
