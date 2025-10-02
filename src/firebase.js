@@ -17,6 +17,21 @@ const firebaseConfig = {
     measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
+// Validate that all required environment variables are present
+if (!firebaseConfig.apiKey || !firebaseConfig.databaseURL || !firebaseConfig.projectId) {
+    console.error('❌ Firebase environment variables are missing!');
+    console.error('Please set the following in Vercel Dashboard → Settings → Environment Variables:');
+    console.error('- VITE_FIREBASE_API_KEY');
+    console.error('- VITE_FIREBASE_AUTH_DOMAIN');
+    console.error('- VITE_FIREBASE_DATABASE_URL');
+    console.error('- VITE_FIREBASE_PROJECT_ID');
+    console.error('- VITE_FIREBASE_STORAGE_BUCKET');
+    console.error('- VITE_FIREBASE_MESSAGING_SENDER_ID');
+    console.error('- VITE_FIREBASE_APP_ID');
+    console.error('- VITE_FIREBASE_MEASUREMENT_ID');
+    throw new Error('Firebase configuration is incomplete. Please check Vercel environment variables.');
+}
+
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
