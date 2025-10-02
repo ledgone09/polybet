@@ -1226,52 +1226,257 @@ body {
 @media (max-width: 992px) {
   .hero-grid {
     grid-template-columns: 1fr;
-    gap: 3rem;
+    gap: 2rem;
+    padding: 3rem 1.5rem;
+    min-height: auto;
   }
   
   .hero-content {
-    order: 2;
+    order: 1;
+    min-height: auto;
   }
   
   .hero-visual {
-    order: 1;
+    order: 2;
+    padding: 0;
   }
   
   .hero-title {
     font-size: 2.5rem;
-  }
-}
-
-@media (max-width: 768px) {
-  .hero-stats {
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-  
-  .hero-actions {
-    flex-direction: column;
-  }
-  
-  .btn {
-    width: 100%;
-  }
-  
-}
-
-@media (max-width: 576px) {
-  .hero-title {
-    font-size: 2rem;
+    margin-bottom: 1rem;
   }
   
   .hero-description {
-    font-size: 1rem;
+    margin-bottom: 1.5rem;
   }
   
-  .hero-grid {
-    padding: 2rem 1rem;
+  .how-it-works-brief {
+    margin-bottom: 1.5rem;
+  }
+  
+  .hero-stats {
+    margin-bottom: 1.5rem;
   }
   
   .prediction-card {
     padding: 1.25rem;
+  }
+  
+  .prediction-card.next {
+    margin-top: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-grid {
+    padding: 2.5rem 1rem;
+    gap: 1.5rem;
+  }
+  
+  .hero-title {
+    font-size: 2.25rem;
+  }
+  
+  .hero-stats {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .stat-value {
+    font-size: 1.1rem;
+  }
+  
+  .stat-label {
+    font-size: 0.75rem;
+  }
+  
+  .hero-actions {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .btn {
+    width: 100%;
+    padding: 0.75rem 1.4rem;
+    font-size: 0.9rem;
+  }
+  
+  .hero-socials {
+    margin-top: 1rem;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  
+  .social-btn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+  }
+  
+  .social-icon {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .social-label {
+    font-size: 0.85rem;
+  }
+  
+  .prediction-card {
+    padding: 1rem;
+  }
+  
+  .prediction-header h3 {
+    font-size: 1rem;
+  }
+  
+  .prediction-timer {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.6rem;
+  }
+  
+  .prediction-question {
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .social-banner-container {
+    flex-direction: column;
+    text-align: center;
+    padding: 1.5rem 1rem;
+  }
+  
+  .social-row {
+    justify-content: center;
+  }
+  
+  .roadmap-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .hero {
+    min-height: auto;
+    padding: 1rem 0;
+  }
+  
+  .hero-grid {
+    padding: 2rem 1rem;
+    gap: 1.5rem;
+  }
+  
+  .hero-title {
+    font-size: 2.1rem;
+    line-height: 1.15;
+    margin-bottom: 1rem;
+  }
+  
+  .hero-description {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+  
+  .how-it-works-brief {
+    padding: 1rem;
+    margin-bottom: 1.25rem;
+  }
+  
+  .brief-title {
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .brief-text {
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+  
+  .hero-stats {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+  
+  .stat-item {
+    text-align: center;
+    padding: 0.75rem 0.5rem;
+  }
+  
+  .stat-value {
+    font-size: 1.15rem;
+  }
+  
+  .stat-label {
+    font-size: 0.7rem;
+  }
+  
+  .hero-actions {
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+  
+  .btn {
+    padding: 0.875rem 1.25rem;
+    font-size: 0.85rem;
+  }
+  
+  .hero-socials {
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  
+  .social-btn {
+    flex: 0 0 auto;
+  }
+  
+  .prediction-card {
+    padding: 1rem;
+    border-radius: var(--border-radius-md);
+  }
+  
+  .prediction-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .prediction-header h3 {
+    font-size: 0.95rem;
+  }
+  
+  .prediction-timer {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.5rem;
+  }
+  
+  .prediction-question {
+    font-size: 0.95rem;
+    margin-bottom: 0.75rem;
+    line-height: 1.3;
+  }
+  
+  .next-options.all-options {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  
+  .next-options.all-options .choice:nth-child(5) {
+    grid-column: auto;
+  }
+  
+  .choice {
+    padding: 0.75rem;
+  }
+  
+  .choice-title {
+    font-size: 0.9rem;
+  }
+  
+  .choice-sub {
+    font-size: 0.75rem;
   }
 }
