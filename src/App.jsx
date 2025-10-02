@@ -8,12 +8,27 @@ import {
   NEXT_TOPIC_QUESTION_ID 
 } from './voteService'
 
+// Helper function to calculate time remaining from a target timestamp
+// Real-time countdown synchronized across all users
+const calculateTimeRemaining = (targetTime) => {
+  const now = new Date().getTime();
+  const target = new Date(targetTime).getTime();
+  const diff = Math.max(0, target - now);
+  
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+  
+  return { hours, minutes, seconds };
+};
+
 function App() {
   const [showDashboard, setShowDashboard] = useState(false)
 
-  // Current prediction data
+  // Current prediction data (should match VoteDashboard)
   const [currentPrediction, setCurrentPrediction] = useState({
     question: "What will the SOL price be?",
+    endTime: "2025-10-02T18:00:00Z",
     options: [
       { id: 'below_204', label: 'Below $204' },
       { id: 'price_206', label: '$206' },
@@ -23,9 +38,10 @@ function App() {
     ]
   });
 
-  // Next prediction data
+  // Next prediction data (should match VoteDashboard)
   const [nextPrediction, setNextPrediction] = useState({
     question: "What should be the next prediction question?",
+    startTime: "2025-10-03T18:00:00Z",
     options: [
       { id: 'btc_price', label: 'BTC Price Prediction' },
       { id: 'fomc_dissent', label: 'FOMC Dissenting Vote' },
@@ -33,6 +49,14 @@ function App() {
       { id: 'sol_price', label: 'Solana Price Prediction' },
       { id: 'party_break', label: 'Senator Party Break' }
     ]
+  });
+
+  // Timer states
+  const [timeRemaining, setTimeRemaining] = useState(() => calculateTimeRemaining(currentPrediction.endTime));
+  const [votingTimeRemaining, setVotingTimeRemaining] = useState(() => {
+    const endTime = new Date(currentPrediction.endTime);
+    const votingEndTime = new Date(endTime.getTime() - (24 * 60 * 60 * 1000));
+    return calculateTimeRemaining(votingEndTime.toISOString());
   });
 
   // Vote data state
@@ -105,12 +129,30 @@ function App() {
       });
     } catch (error) {
       console.error('Error fetching pool data:', error);
-      // Fallback to mock data
+      // Set to 0 if unable to fetch
       setPoolData({
-        currentPool: 12500
+        currentPool: 0
       });
     }
   };
+
+  // Update timers in real-time (every second)
+  useEffect(() => {
+    const updateTimers = () => {
+      setTimeRemaining(calculateTimeRemaining(currentPrediction.endTime));
+      const endTime = new Date(currentPrediction.endTime);
+      const votingEndTime = new Date(endTime.getTime() - (24 * 60 * 60 * 1000));
+      setVotingTimeRemaining(calculateTimeRemaining(votingEndTime.toISOString()));
+    };
+
+    // Update immediately
+    updateTimers();
+
+    // Update every second for real-time countdown
+    const timerInterval = setInterval(updateTimers, 1000);
+
+    return () => clearInterval(timerInterval);
+  }, [currentPrediction.endTime]);
 
   // Update vote stats and pool data on component mount and with real-time updates
   useEffect(() => {
@@ -137,6 +179,11 @@ function App() {
       clearInterval(interval);
     };
   }, []);
+
+  // Helper to format time with seconds
+  const formatTime = (timeObj) => {
+    return `${timeObj.hours}h ${timeObj.minutes}m ${timeObj.seconds}s`;
+  };
 
   if (showDashboard) {
     return <VoteDashboard setShowDashboard={setShowDashboard} />;
@@ -214,7 +261,7 @@ function App() {
             <div className="prediction-card current">
               <div className="prediction-header">
                 <h3>Current Prediction</h3>
-                <span className="prediction-timer">4h 32m remaining</span>
+                <span className="prediction-timer">{formatTime(timeRemaining)} remaining</span>
               </div>
               <div className="prediction-question">
                 {currentPrediction.question}
@@ -250,7 +297,7 @@ function App() {
             <div className="prediction-card next">
               <div className="prediction-header small">
                 <h3>Vote for Next Topic</h3>
-                <span className="prediction-timer">Voting ends in 12h</span>
+                <span className="prediction-timer">Voting ends in {formatTime(votingTimeRemaining)}</span>
               </div>
               <div className="prediction-question">
                 {nextPrediction.question}
@@ -381,16 +428,6 @@ function App() {
               <p className="feature-description">
                 Launch your own prediction markets on any topic from crypto prices to political events. Set your own fees and earn from every trade.
               </p>
-              <div className="feature-stats">
-                <div className="stat">
-                  <span className="stat-value">w</span>
-                  <span className="stat-label">Markets</span>
-                </div>
-                <div className="stat">
-                  <span className="stat-value">You</span>
-                  <span className="stat-label">Create</span>
-                </div>
-              </div>
             </div>
             
             <div className="feature-card">

@@ -19,6 +19,20 @@ const TOKEN_CONTRACT_ADDRESS = '8HiyARcUe6MQro3iRwbUn8e8B4PMgXjaTL9D3bb3w59f';
 // Minimum tokens required to vote (20 million)
 const MIN_TOKENS_TO_VOTE = 20000000;
 
+// Helper function to calculate time remaining from a target timestamp
+// Real-time countdown synchronized across all users
+const calculateTimeRemaining = (targetTime) => {
+  const now = new Date().getTime();
+  const target = new Date(targetTime).getTime();
+  const diff = Math.max(0, target - now);
+  
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+  
+  return { hours, minutes, seconds };
+};
+
 function VoteDashboard({ setShowDashboard }) {
   // Pool data state
   const [poolData, setPoolData] = useState({
@@ -141,11 +155,15 @@ function VoteDashboard({ setShowDashboard }) {
     userVote: null
   });
 
-  // 72 hours total for current prediction (voting closes at 48h, 24h decision period)
-  const [timeRemaining, setTimeRemaining] = useState({ hours: 72, minutes: 0 });
-  const [votingTimeRemaining, setVotingTimeRemaining] = useState({ hours: 48, minutes: 0 });
-  // 72 hours for next prediction voting
-  const [timeUntilNext, setTimeUntilNext] = useState({ hours: 72, minutes: 0 });
+  // Initialize timers with calculated values based on actual timestamps
+  const [timeRemaining, setTimeRemaining] = useState(() => calculateTimeRemaining(currentVote.endTime));
+  const [votingTimeRemaining, setVotingTimeRemaining] = useState(() => {
+    // Voting ends 24 hours before the prediction ends
+    const endTime = new Date(currentVote.endTime);
+    const votingEndTime = new Date(endTime.getTime() - (24 * 60 * 60 * 1000));
+    return calculateTimeRemaining(votingEndTime.toISOString());
+  });
+  const [timeUntilNext, setTimeUntilNext] = useState(() => calculateTimeRemaining(nextVote.startTime));
 
   const { connected, connect, disconnect, publicKey, wallets, wallet, select } = useWallet();
 
@@ -370,11 +388,11 @@ function VoteDashboard({ setShowDashboard }) {
       }
     } catch (error) {
       console.error('Error fetching Solana data:', error);
-      // Fallback to mock data
+      // Set to 0 if unable to fetch
       setPoolData(prev => ({
         ...prev,
-        currentPool: 12500,
-        yourTokens: 0 // Don't show mock token balance, only real balance
+        currentPool: 0,
+        yourTokens: 0
       }));
     } finally {
       setLoading(false);
@@ -404,48 +422,33 @@ function VoteDashboard({ setShowDashboard }) {
     };
   }, [connected, publicKey]); // Refetch when wallet connection state changes
 
-  // Simulate countdown timer
+  // Real countdown timer that recalculates based on actual time (every second)
   useEffect(() => {
-    const timer = setInterval(() => {
-      // Countdown for total prediction time (72 hours)
-      setTimeRemaining(prev => {
-        if (prev.minutes > 0) {
-          return { ...prev, minutes: prev.minutes - 1 };
-        } else if (prev.hours > 0) {
-          return { hours: prev.hours - 1, minutes: 59 };
-        } else {
-          return prev;
-        }
-      });
+    // Function to update all timers
+    const updateTimers = () => {
+      // Recalculate time remaining for total prediction time
+      setTimeRemaining(calculateTimeRemaining(currentVote.endTime));
       
-      // Countdown for voting period (48 hours)
-      setVotingTimeRemaining(prev => {
-        if (prev.minutes > 0) {
-          return { ...prev, minutes: prev.minutes - 1 };
-        } else if (prev.hours > 0) {
-          return { hours: prev.hours - 1, minutes: 59 };
-        } else {
-          return prev;
-        }
-      });
+      // Recalculate voting period time remaining (ends 24 hours before prediction ends)
+      const endTime = new Date(currentVote.endTime);
+      const votingEndTime = new Date(endTime.getTime() - (24 * 60 * 60 * 1000));
+      setVotingTimeRemaining(calculateTimeRemaining(votingEndTime.toISOString()));
       
-      // Countdown for next prediction voting (72 hours)
-      setTimeUntilNext(prev => {
-        if (prev.minutes > 0) {
-          return { ...prev, minutes: prev.minutes - 1 };
-        } else if (prev.hours > 0) {
-          return { hours: prev.hours - 1, minutes: 59 };
-        } else {
-          return prev;
-        }
-      });
-    }, 60000); // Update every minute
+      // Recalculate time until next prediction voting
+      setTimeUntilNext(calculateTimeRemaining(nextVote.startTime));
+    };
+
+    // Update immediately on mount
+    updateTimers();
+
+    // Then update every second for real-time countdown
+    const timer = setInterval(updateTimers, 1000);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [currentVote.endTime, nextVote.startTime]);
 
   // Check if voting is still open (48 hours out of 72 hours total)
-  const isVotingOpen = votingTimeRemaining.hours > 0 || votingTimeRemaining.minutes > 0;
+  const isVotingOpen = votingTimeRemaining.hours > 0 || votingTimeRemaining.minutes > 0 || votingTimeRemaining.seconds > 0;
 
   // Real voting function
   const handleVote = async (optionId) => {
@@ -558,7 +561,7 @@ function VoteDashboard({ setShowDashboard }) {
   };
 
   const formatTime = (timeObj) => {
-    return `${timeObj.hours}h ${timeObj.minutes}m`;
+    return `${timeObj.hours}h ${timeObj.minutes}m ${timeObj.seconds}s`;
   };
 
   return (
