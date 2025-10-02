@@ -28,7 +28,7 @@ function App() {
   // Current prediction data (should match VoteDashboard)
   const [currentPrediction, setCurrentPrediction] = useState({
     question: "What will the SOL price be?",
-    endTime: "2025-10-02T18:00:00Z",
+    endTime: "2025-10-05T18:00:00Z",
     options: [
       { id: 'below_204', label: 'Below $204' },
       { id: 'price_206', label: '$206' },
@@ -41,7 +41,7 @@ function App() {
   // Next prediction data (should match VoteDashboard)
   const [nextPrediction, setNextPrediction] = useState({
     question: "What should be the next prediction question?",
-    startTime: "2025-10-03T18:00:00Z",
+    startTime: "2025-10-05T18:00:00Z",
     options: [
       { id: 'btc_price', label: 'BTC Price Prediction' },
       { id: 'fomc_dissent', label: 'FOMC Dissenting Vote' },
