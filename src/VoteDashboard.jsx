@@ -8,7 +8,6 @@ import {
   getUserVote,
   getQuestionVoteCount,
   subscribeToVotes,
-  clearAllVotes,
   CURRENT_QUESTION_ID,
   NEXT_TOPIC_QUESTION_ID
 } from './voteService';
@@ -142,8 +141,11 @@ function VoteDashboard({ setShowDashboard }) {
     userVote: null
   });
 
-  const [timeRemaining, setTimeRemaining] = useState({ hours: 4, minutes: 32 });
-  const [timeUntilNext, setTimeUntilNext] = useState({ hours: 12, minutes: 0 });
+  // 72 hours total for current prediction (voting closes at 48h, 24h decision period)
+  const [timeRemaining, setTimeRemaining] = useState({ hours: 72, minutes: 0 });
+  const [votingTimeRemaining, setVotingTimeRemaining] = useState({ hours: 48, minutes: 0 });
+  // 72 hours for next prediction voting
+  const [timeUntilNext, setTimeUntilNext] = useState({ hours: 72, minutes: 0 });
 
   const { connected, connect, disconnect, publicKey, wallets, wallet, select } = useWallet();
 
@@ -405,6 +407,7 @@ function VoteDashboard({ setShowDashboard }) {
   // Simulate countdown timer
   useEffect(() => {
     const timer = setInterval(() => {
+      // Countdown for total prediction time (72 hours)
       setTimeRemaining(prev => {
         if (prev.minutes > 0) {
           return { ...prev, minutes: prev.minutes - 1 };
@@ -415,6 +418,18 @@ function VoteDashboard({ setShowDashboard }) {
         }
       });
       
+      // Countdown for voting period (48 hours)
+      setVotingTimeRemaining(prev => {
+        if (prev.minutes > 0) {
+          return { ...prev, minutes: prev.minutes - 1 };
+        } else if (prev.hours > 0) {
+          return { hours: prev.hours - 1, minutes: 59 };
+        } else {
+          return prev;
+        }
+      });
+      
+      // Countdown for next prediction voting (72 hours)
       setTimeUntilNext(prev => {
         if (prev.minutes > 0) {
           return { ...prev, minutes: prev.minutes - 1 };
@@ -429,8 +444,17 @@ function VoteDashboard({ setShowDashboard }) {
     return () => clearInterval(timer);
   }, []);
 
+  // Check if voting is still open (48 hours out of 72 hours total)
+  const isVotingOpen = votingTimeRemaining.hours > 0 || votingTimeRemaining.minutes > 0;
+
   // Real voting function
   const handleVote = async (optionId) => {
+    // Check if voting period is still open
+    if (!isVotingOpen) {
+      alert('Voting period has ended. We are now in the 24-hour decision period.');
+      return;
+    }
+
     // Check if wallet is connected
     if (!connected || !publicKey) {
       alert('Please connect your wallet to vote');
@@ -609,23 +633,6 @@ function VoteDashboard({ setShowDashboard }) {
             >
               {loading ? 'Refreshing...' : '🔄 Refresh Data'}
             </button>
-            <button 
-              onClick={async () => {
-                if (confirm('Clear all votes globally? This affects all users!')) {
-                  const success = await clearAllVotes();
-                  if (success) {
-                    alert('All votes cleared globally!');
-                    window.location.reload();
-                  } else {
-                    alert('Failed to clear votes');
-                  }
-                }
-              }} 
-              className="refresh-button"
-              style={{marginLeft: '10px', backgroundColor: '#ff4444'}}
-            >
-              🗑️ Clear All Votes Globally
-            </button>
           </div>
         </div>
       </div>
@@ -634,14 +641,34 @@ function VoteDashboard({ setShowDashboard }) {
         <div className="vote-card current">
           <div className="vote-header">
             <h2 className="vote-title">Current Prediction</h2>
-            <span className="vote-timer">{formatTime(timeRemaining)} remaining</span>
+            <span className="vote-timer">{formatTime(timeRemaining)} until resolution</span>
           </div>
           <div className="vote-question">
             {currentVote.question}
           </div>
           
+          {/* Voting period status */}
+          <div className="voting-period-status" style={{
+            padding: '0.75rem',
+            marginBottom: '1rem',
+            borderRadius: '8px',
+            backgroundColor: isVotingOpen ? '#1a472a' : '#472a1a',
+            border: `1px solid ${isVotingOpen ? '#2d7a4a' : '#7a4a2d'}`,
+            textAlign: 'center'
+          }}>
+            {isVotingOpen ? (
+              <span style={{color: '#4ade80', fontSize: '0.9rem', fontWeight: 'bold'}}>
+                🗳️ Voting Open: {formatTime(votingTimeRemaining)} remaining
+              </span>
+            ) : (
+              <span style={{color: '#fb923c', fontSize: '0.9rem', fontWeight: 'bold'}}>
+                ⏱️ Decision Period: Voting closed, awaiting resolution in {formatTime(timeRemaining)}
+              </span>
+            )}
+          </div>
+          
           {/* Voting eligibility status */}
-          {connected && (
+          {connected && isVotingOpen && (
             <div className={`eligibility-status ${votingEligible ? 'eligible' : 'not-eligible'}`}>
               {votingEligible ? (
                 <span>✅ Eligible to vote ({poolData.yourTokens.toLocaleString()} tokens)</span>
@@ -654,9 +681,9 @@ function VoteDashboard({ setShowDashboard }) {
           <div className="vote-options">
             {currentVote.options.map(option => (
               <div 
-                className={`vote-option ${currentVote.userVote === option.id ? 'selected' : ''} ${!votingEligible || currentVote.userVote ? 'disabled' : ''}`}
+                className={`vote-option ${currentVote.userVote === option.id ? 'selected' : ''} ${!votingEligible || currentVote.userVote || !isVotingOpen ? 'disabled' : ''}`}
                 key={option.id}
-                onClick={() => votingEligible && !currentVote.userVote ? handleVote(option.id) : null}
+                onClick={() => votingEligible && !currentVote.userVote && isVotingOpen ? handleVote(option.id) : null}
               >
                 <div className="option-info">
                   <div className="option-label">{option.label}</div>
@@ -674,7 +701,9 @@ function VoteDashboard({ setShowDashboard }) {
           </div>
           
           <div className="vote-actions">
-            {!connected ? (
+            {!isVotingOpen ? (
+              <button className="vote-button disabled">⏱️ Voting Closed - Decision Period Active</button>
+            ) : !connected ? (
               <button className="vote-button secondary">Connect Wallet to Vote</button>
             ) : currentVote.userVote ? (
               <button className="vote-button primary">✅ Vote Submitted: {currentVote.userVote.toUpperCase()}</button>
@@ -689,7 +718,7 @@ function VoteDashboard({ setShowDashboard }) {
         <div className="vote-card next">
           <div className="vote-header">
             <h2 className="vote-title">Vote for Next Prediction</h2>
-            <span className="vote-timer">Voting ends in {formatTime(timeUntilNext)}</span>
+            <span className="vote-timer">{formatTime(timeUntilNext)} to vote</span>
           </div>
           <div className="vote-question">
             {nextVote.question}
@@ -748,7 +777,7 @@ function VoteDashboard({ setShowDashboard }) {
           <div className="info-card">
             <div className="info-badge">1</div>
             <h3 className="info-card-title">Voting Period</h3>
-            <p className="info-card-text">Votes are open for 48 hours. After that, voting closes 24 hours before resolution.</p>
+            <p className="info-card-text">Each prediction runs for 72 hours total. Voting is open for the first 48 hours, followed by a 24-hour decision period before resolution.</p>
           </div>
           
           <div className="info-card">
