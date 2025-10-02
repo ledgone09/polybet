@@ -538,7 +538,7 @@ body {
   }
   
   .roadmap {
-    padding: 4rem 1rem;
+    padding: 3rem 1rem 1rem;
   }
   
   .title-main {
@@ -552,7 +552,7 @@ body {
   .roadmap-grid {
     grid-template-columns: 1fr;
     gap: 1.5rem;
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
   }
   
   .feature-card {
@@ -910,7 +910,7 @@ body {
 
 /* Roadmap Section - Masterclass Design */
 .roadmap {
-  padding: 6rem 2rem 1rem;
+  padding: 6rem 2rem 2rem;
   position: relative;
 }
 
@@ -1179,9 +1179,9 @@ body {
 
 /* Social banner */
 .social-banner {
-  padding: 2rem;
+  padding: 2rem 2rem 3rem;
   position: relative;
-  margin-bottom: 2rem;
+  margin-bottom: 0;
 }
 
 .social-banner-container {
@@ -1343,8 +1343,8 @@ body {
   }
   
   .social-banner {
-    padding: 1.5rem 1rem;
-    margin-bottom: 1rem;
+    padding: 1rem 1rem 2rem;
+    margin-bottom: 0;
   }
   
   .social-banner-container {
@@ -1381,8 +1381,8 @@ body {
   }
   
   .hero-title {
-    font-size: 2.1rem;
-    line-height: 1.15;
+    font-size: 2.8rem;
+    line-height: 1.1;
     margin-bottom: 1rem;
   }
   
@@ -1427,13 +1427,17 @@ body {
   }
   
   .hero-actions {
-    gap: 0.75rem;
+    gap: 0.5rem;
     margin-bottom: 1rem;
   }
   
   .btn {
-    padding: 0.875rem 1.25rem;
-    font-size: 0.85rem;
+    padding: 0.75rem 1.1rem;
+    font-size: 0.8rem;
+  }
+  
+  .btn-primary, .btn-secondary {
+    padding: 0.7rem 1rem;
   }
   
   .hero-socials {
@@ -1493,9 +1497,17 @@ body {
     font-size: 0.75rem;
   }
   
+  .roadmap {
+    padding: 2.5rem 1rem 0.75rem;
+  }
+  
+  .roadmap-grid {
+    margin-bottom: 1.5rem;
+  }
+  
   .social-banner {
-    padding: 1.25rem 0.75rem;
-    margin-bottom: 0.5rem;
+    padding: 0.75rem 0.75rem 1.5rem;
+    margin-bottom: 0;
   }
   
   .social-banner-container {
